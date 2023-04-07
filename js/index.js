@@ -4,12 +4,21 @@ const ctx = canvas.getContext('2d')
 let gameOn = false
 let animationId
 let obstacleId
+let score = 0
 
 const road = new Image()
 road.src = './images/road.png'
 
 const car = new Image()
 car.src = './images/car.png'
+
+function showScore () {
+  ctx.fillStyle = 'black'
+  ctx.fillRect(380,15,100,35)
+  ctx.fillStyle = 'white'
+  ctx.font = '20px sans-serif'
+  ctx.fillText(`Score: ${score}`, 390, 40)
+}
 
 const player = {
   x: canvas.width/2 - 25,
@@ -39,16 +48,28 @@ class Obstacle {
 }
 
 function gameOver() {
+  score = 0
 
+  gameOn = false
   ctx.clearRect(0, 0, 500, 700)
   ctx.fillStyle = 'black'
   ctx.fillRect(0,0,500,700)
   ctx.fillStyle = 'white'
-  ctx.fillText("Game over", 200, 300)
+  ctx.font = '40px sans-serif'
+  ctx.fillText("Game over", 150, 300)
+  if (score < 10) {
+    ctx.fillText(`Final score: ${score}`, 150, 340)
+    ctx.fillText("You lose!", 150, 380)
+    
+  } else {
+
+    ctx.fillText(`Final score: ${score}`, 150, 340)
+    ctx.fillText("You win!", 150, 380)
+
+  }
   obstaclesArr = []
   clearInterval(animationId)
   clearInterval(obstacleId)
-  gameOn = false
   player.x = canvas.width/2 - 25
   player.y = canvas.height - 120
 
@@ -76,16 +97,21 @@ function animationLoop() {
   ctx.drawImage(road, 0, 0, 500, 700)
   player.draw()
 
+  
   obstaclesArr.forEach((obstacle, i, arr) => {
     checkCollision(obstacle)
     obstacle.y += 1
     if (obstacle.y > canvas.height) {
+      score += 1
       arr.splice(i, 1)
     }
     obstacle.draw()
   })
-
-
+  showScore()
+  
+  if (score > 1) {
+    gameOver()
+  }
 }
 
 
